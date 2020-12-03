@@ -5,10 +5,10 @@ import { t, jt, ngettext, msgid } from "ttag";
 
 import Card from "metabase/components/Card";
 import DeleteModalWithConfirm from "metabase/components/DeleteModalWithConfirm";
+import EmailAttachmentPicker from "metabase/sharing/components/EmailAttachmentPicker";
 import Icon from "metabase/components/Icon";
 import Link from "metabase/components/Link";
 import ModalWithTrigger from "metabase/components/ModalWithTrigger";
-import Radio from "metabase/components/Radio";
 import RecipientPicker from "metabase/pulse/components/RecipientPicker";
 import SchedulePicker from "metabase/components/SchedulePicker";
 import Select, { Option } from "metabase/components/Select";
@@ -245,42 +245,6 @@ class SharingSidebar extends React.Component {
     const { pulse } = this.props;
     this.setPulse({ ...pulse, skip_if_empty: !pulse.skip_if_empty });
   };
-
-  toggleAttach = value => {
-    if (value) {
-      // if any are set, use that value, otherwise use "csv", our default
-      const existingValue = this.attachmentTypeValue();
-      this.setAttachmentType(existingValue || "csv");
-    } else {
-      this.setAttachmentType(null);
-    }
-  };
-
-  setAttachmentType(value) {
-    const { pulse } = this.props;
-
-    const newPulse = {
-      ...pulse,
-      cards: pulse.cards.map(card => {
-        card.include_xls = value === "xls";
-        card.include_csv = value === "csv";
-        return card;
-      }),
-    };
-    this.setPulse(newPulse);
-  }
-
-  attachmentTypeValue() {
-    const { pulse } = this.props;
-
-    if (pulse.cards.some(c => c.include_xls)) {
-      return "xls";
-    } else if (pulse.cards.some(c => c.include_csv)) {
-      return "csv";
-    } else {
-      return null;
-    }
-  }
 
   handleSave = async () => {
     const { pulse, dashboard, formInput } = this.props;
@@ -738,23 +702,11 @@ class SharingSidebar extends React.Component {
                   tooltip={t`Attachments can contain up to 2,000 rows of data.`}
                 />
               </div>
-              <Toggle
-                value={this.attachmentTypeValue() != null}
-                onChange={this.toggleAttach}
-              />
             </div>
-            {this.attachmentTypeValue() != null && (
-              <div className="text-bold py2 flex justify-between align-center">
-                <Radio
-                  options={[
-                    { name: "CSV", value: "csv" },
-                    { name: "XLSX", value: "xls" },
-                  ]}
-                  onChange={value => this.setAttachmentType(value)}
-                  value={this.attachmentTypeValue()}
-                />
-              </div>
-            )}
+            <EmailAttachmentPicker
+              pulse={pulse}
+              setPulse={this.setPulse.bind(this)}
+            />
             {pulse.id != null && this.renderDeleteSubscription()}
           </div>
         </Sidebar>
