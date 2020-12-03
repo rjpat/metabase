@@ -463,7 +463,7 @@ class SharingSidebar extends React.Component {
 
   render() {
     const { editingMode } = this.state;
-    const { pulse, formInput, pulseList, onCancel } = this.props;
+    const { dashboard, pulse, formInput, pulseList, onCancel } = this.props;
 
     // protect from empty values that will mess this up
     if (formInput === null || pulse === null || pulseList === null) {
@@ -704,6 +704,9 @@ class SharingSidebar extends React.Component {
               </div>
             </div>
             <EmailAttachmentPicker
+              cards={dashboard.ordered_cards
+                .map(ocard => ocard.card)
+                .filter(card => card.display !== "text")}
               pulse={pulse}
               setPulse={this.setPulse.bind(this)}
             />
